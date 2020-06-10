@@ -1,0 +1,5 @@
+System:
+  ServiceName: consul-registy-service
+Logs:
+  LogFilePath: G:\goworkbench\goprojects\src\exec\logs\info.log
+  LogLevel: trace
