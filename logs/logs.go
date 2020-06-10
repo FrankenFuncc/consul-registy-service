@@ -74,7 +74,6 @@ func (p *logFileWriter) Write(data []byte) (n int, err error) {
 	if p.file == nil {
 		return 0, errors.New("file not opened")
 	}
-
 	//判断是否需要切换日期
 	fileDate := time.Now().Format("20060102")
 		filename := fmt.Sprintf("%s/%s-%s.log", p.logPath,  p.appName, fileDate)
