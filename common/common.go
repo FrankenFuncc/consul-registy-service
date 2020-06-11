@@ -2,14 +2,15 @@ package common
 
 import (
 	conf "exec/config"
-	"log"
+	"github.com/sirupsen/logrus"
 )
 
-func GetLogConf() (*conf.Config, error) {
+func GetConf() (*conf.Config, error) {
 	var config conf.Config
-	config2, err := config.LogConfig()
+	config2, err := config.GetConfig()
 	if err != nil {
-		log.Println("ERR>>>", err.Error())
+		logrus.WithFields(logrus.Fields{
+		}).Fatal(err.Error())
 	}
 	return config2, err
 }

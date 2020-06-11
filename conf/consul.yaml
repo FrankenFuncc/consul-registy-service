@@ -1,5 +1,19 @@
 System:
   ServiceName: consul-registy-service
+  ListenAddress:
+  Port:
+  FindAddress: 8.8.8.8:80
 Logs:
   LogFilePath: G:\goworkbench\goprojects\src\exec\logs\info.log
   LogLevel: trace
+Consul:
+  Address: 172.16.100.71:8500,172.16.100.72:8500,192.16.100.73:8500
+  Token: 8dc1eb67-1f5f-4e10-ad9d-5e58b047647c
+  CheckTimeout: 5s
+  CheckInterval: 5s
+  CheckDeregisterCriticalServiceAfter: true
+  CheckDeregisterCriticalServiceAfterTime: 5s
+Service:
+  Tag: node-exporter
+  Address: 172.166.22.32
+  Port: 9100

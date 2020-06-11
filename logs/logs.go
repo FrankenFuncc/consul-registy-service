@@ -41,7 +41,7 @@ func (s *LogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	}
 	//fmt.Println(entry.Data)
 	var conf *config.Config
-	config, err := conf.LogConfig()
+	config, err := conf.GetConfig()
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 		}).Info(err.Error())
@@ -88,7 +88,7 @@ func (p *logFileWriter) Write(data []byte) (n int, err error) {
 
 func SetLogLevel() error {
 	var conf *conf.Config
-	config2, err := conf.LogConfig()
+	config2, err := conf.GetConfig()
 	if err !=nil {
 		logrus.WithFields(logrus.Fields{
 		}).Fatal(err.Error())
