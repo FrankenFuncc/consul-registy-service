@@ -1,10 +1,17 @@
 package config
 
 import (
+	"flag"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
+
+var confpath string
+
+func init() {
+	flag.StringVar(&confpath, "confpath", "conf/consul.yaml", "默认为conf/consul.yaml")
+}
 
 type Logs struct {
 	LogFilePath    string `yaml:"LogFilePath"`
@@ -32,6 +39,7 @@ type System struct {
 	ListenAddress  string `yaml:"ListenAddress"`
 	Port           string `yaml:"Port"`
 	FindAddress    string `yaml:"FindAddress"`
+	ConfPath       string `yaml:"ConfPath"`
 }
 
 type Service struct {
@@ -41,7 +49,8 @@ type Service struct {
 }
 
 func (GC *Config) GetConfig() (*Config, error) {
-	config, err := ioutil.ReadFile("G:\\goworkbench\\goprojects\\src\\exec\\conf\\consul.yaml")
+	flag.Parse()
+	config, err := ioutil.ReadFile(confpath)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 		}).Info(err.Error())

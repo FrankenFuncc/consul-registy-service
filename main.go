@@ -10,8 +10,8 @@ import (
 )
 
 func GetConf() *conf.Config {
-	var conf *conf.Config
-	config2, err := conf.GetConfig()
+	var conf2 *conf.Config
+	config2, err := conf2.GetConfig()
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 		}).Fatal(err.Error())
@@ -19,11 +19,10 @@ func GetConf() *conf.Config {
 	return config2
 }
 func main() {
-	var conf *config.Config
-	config, err := conf.GetConfig()
-	logs.InitLog(config.SiteLogs.LogFilePath)
+	var conf2 *config.Config
+	config2, err := conf2.GetConfig()
+	logs.InitLog(config2.SiteLogs.LogFilePath)
 	RegistyStart := new(consul.Addresses)
-	RegistyStart.GetValues()
 	_, err = RegistyStart.CheckSorted("node-exporter")
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
