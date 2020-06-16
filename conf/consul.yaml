@@ -2,10 +2,10 @@ System:
   ServiceName: consul-registy-service
   ListenAddress: 0.0.0.0
   Port: 9984
+  #通过此IP与端口来检索出口网卡IP地址
   FindAddress: 8.8.8.8:80
-  ConfPath: G:\goworkbench\goprojects\src\exec\conf\consul.yaml
 Logs:
-  LogFilePath: G:\goworkbench\goprojects\src\exec\logs\info.log
+  LogFilePath: G:\goworkbench\goprojects\src\exec\logs\conusl.log
   LogLevel: trace
 Consul:
   Address: 172.16.100.71:8500,172.16.100.72:8500,172.16.100.73:8500
@@ -16,5 +16,6 @@ Consul:
   CheckDeregisterCriticalServiceAfterTime: 5s
 Service:
   Tag: node-exporter
+  #Address空则默认通过FindAddress配置来检索出口网卡IP地址
   Address: 172.166.22.22
   Port: 9100
