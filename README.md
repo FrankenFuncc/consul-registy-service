@@ -3,9 +3,9 @@
 ##### 教程
 
 ```
-$ git clone https://github.com/FrankenFuncc/consul-registy-service.git
-$ go buil main.go
-$ ./main -confpath=<path-to-conf>
+$ wget https://github.com/FrankenFuncc/consul-registy-service/releases/download/202006161758/consulR.zip
+$ unzip consulR.zip
+$ ./consulR -confpath=<path-to-conf>
 ```
 
 
