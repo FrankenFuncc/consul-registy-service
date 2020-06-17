@@ -8,14 +8,6 @@ import (
 	"net/http"
 )
 
-func GetConf() *conf.Config {
-	var conf2 *conf.Config
-	config2, err := conf2.GetConfig()
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Fatal(err.Error())
-	}
-	return config2
-}
 func main() {
 	logs.InitLog(conf.GetConf().SiteLogs.LogFilePath)
 	RegistyStart := new(consul.Addresses)
@@ -30,7 +22,7 @@ func main() {
 	}
 	//定义一个http接口
 	http.HandleFunc("/", consul.Handler)
-	err = http.ListenAndServe(GetConf().System.ListenAddress+":"+GetConf().System.Port, nil)
+	err = http.ListenAndServe(conf.GetConf().System.ListenAddress+":"+conf.GetConf().System.Port, nil)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Info(err.Error())
 		panic("Error" + err.Error())
