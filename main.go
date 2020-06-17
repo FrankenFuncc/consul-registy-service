@@ -1,7 +1,6 @@
 package main
 
 import (
-	"exec/config"
 	conf "exec/config"
 	consul "exec/cons"
 	logs "exec/logs"
@@ -13,33 +12,27 @@ func GetConf() *conf.Config {
 	var conf2 *conf.Config
 	config2, err := conf2.GetConfig()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-		}).Fatal(err.Error())
+		logrus.WithFields(logrus.Fields{}).Fatal(err.Error())
 	}
 	return config2
 }
 func main() {
-	var conf2 *config.Config
-	config2, err := conf2.GetConfig()
-	logs.InitLog(config2.SiteLogs.LogFilePath)
+	logs.InitLog(conf.GetConf().SiteLogs.LogFilePath)
 	RegistyStart := new(consul.Addresses)
-	_, err = RegistyStart.CheckSorted("node-exporter")
+	_, err := RegistyStart.CheckSorted("node-exporter")
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-		}).Info(err.Error())
+		logrus.WithFields(logrus.Fields{}).Info(err.Error())
 	}
 	err = RegistyStart.CheckAddr("node-exporter")
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-		}).Info(err.Error())
+		logrus.WithFields(logrus.Fields{}).Info(err.Error())
 		panic("Error" + err.Error())
 	}
 	//定义一个http接口
 	http.HandleFunc("/", consul.Handler)
-	err = http.ListenAndServe(GetConf().System.ListenAddress + ":" + GetConf().System.Port, nil)
+	err = http.ListenAndServe(GetConf().System.ListenAddress+":"+GetConf().System.Port, nil)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-		}).Info(err.Error())
+		logrus.WithFields(logrus.Fields{}).Info(err.Error())
 		panic("Error" + err.Error())
 	}
 }

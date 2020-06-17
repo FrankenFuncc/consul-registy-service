@@ -38,8 +38,8 @@ type CatalogServices []CatalogService
 
 func GetAddrs() string {
 	//获取出口网卡IP
-	if GetConf().Service.Address == "" {
-		conn, err := net.Dial("udp", GetConf().System.FindAddress)
+	if conf.GetConf().Service.Address == "" {
+		conn, err := net.Dial("udp", conf.GetConf().System.FindAddress)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Fatal(err.Error())
 			panic("error" + err.Error())
@@ -48,18 +48,27 @@ func GetAddrs() string {
 		localAddr := conn.LocalAddr().(*net.UDPAddr)
 		return localAddr.IP.String()
 	}
-	return GetConf().Service.Address
+	return conf.GetConf().Service.Address
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("you are visiting health check api"))
 }
 
+func IsToken() bool {
+	v := conf.GetConf().Consul.Token
+	if v != "" {
+		return true
+	} else {
+		return false
+	}
+}
+
 func SearchIssues(HttpAddress string, ApiAddress string) ([]string, []string, error) {
 	//Get方式获取Json反序列化成CatalogService结构体
 	//读取ServiceID和其所在的节点IP
 	logrus.WithFields(logrus.Fields{}).Info("Geting Data From " + "http://" + HttpAddress + ApiAddress + "...")
-	resp, err := http.Get("http://" + HttpAddress + ApiAddress + "?token=" + GetConf().Consul.Token)
+	resp, err := http.Get("http://" + HttpAddress + ApiAddress + "?token=" + conf.GetConf().Consul.Token)
 	if err != nil {
 		logrus.Error(err.Error())
 		return nil, nil, err
@@ -85,14 +94,14 @@ func SearchIssues(HttpAddress string, ApiAddress string) ([]string, []string, er
 func (GCA *Addresses) GetConsulAddr() string {
 	//获取随机种子取得随机IP
 	randaddr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	consuladdress := strings.Split(GetConf().Consul.Address, ",")
+	consuladdress := strings.Split(conf.GetConf().Consul.Address, ",")
 	consulregisty := consuladdress[randaddr.Intn(3)]
 	return consulregisty
 }
 
 func (GCA *Addresses) GetAllAddr() []string {
 	//获取所有Consul地址
-	consuladdress := strings.Split(GetConf().Consul.Address, ",")
+	consuladdress := strings.Split(conf.GetConf().Consul.Address, ",")
 	return consuladdress
 }
 
@@ -127,7 +136,7 @@ func (CR *Addresses) ConsulRegister(addr string) {
 	// 创建连接consul服务配置
 	config := consulapi.DefaultConfig()
 	config.Address = addr
-	config.Token = GetConf().Consul.Token
+	config.Token = conf.GetConf().Consul.Token
 	client, err := consulapi.NewClient(config)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Fatal(err.Error())
@@ -136,25 +145,25 @@ func (CR *Addresses) ConsulRegister(addr string) {
 	logrus.WithFields(logrus.Fields{}).Info("New Consul Connection Created...")
 	// 创建注册到consul的服务到
 	registration := new(consulapi.AgentServiceRegistration)
-	registration.ID = GetConf().Service.Tag + "-" + GetAddrs()
-	registration.Name = GetConf().Service.Tag
+	registration.ID = conf.GetConf().Service.Tag + "-" + GetAddrs()
+	registration.Name = conf.GetConf().Service.Tag
 	var port int
-	port, err = strconv.Atoi(GetConf().Service.Port)
+	port, err = strconv.Atoi(conf.GetConf().Service.Port)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Fatal(err.Error())
 	}
 	registration.Port = port
-	registration.Tags = []string{GetConf().Service.Tag}
+	registration.Tags = []string{conf.GetConf().Service.Tag}
 	registration.Address = GetAddrs()
 	// 增加consul健康检查回调函数
 	check := new(consulapi.AgentServiceCheck)
-	check.HTTP = fmt.Sprintf("http://%s:%d?token=%v", registration.Address, registration.Port, GetConf().Consul.Token)
-	check.Timeout = GetConf().Consul.CheckTimeout
-	check.Interval = GetConf().Consul.CheckInterval
-	if GetConf().Consul.CheckDeregisterCriticalServiceAfter == false {
+	check.HTTP = fmt.Sprintf("http://%s:%d?token=%v", registration.Address, registration.Port, conf.GetConf().Consul.Token)
+	check.Timeout = conf.GetConf().Consul.CheckTimeout
+	check.Interval = conf.GetConf().Consul.CheckInterval
+	if conf.GetConf().Consul.CheckDeregisterCriticalServiceAfter == false {
 		logrus.WithFields(logrus.Fields{}).Info("未开启自动删除注册服务...")
-	} else if GetConf().Consul.CheckDeregisterCriticalServiceAfterTime != "" {
-		check.DeregisterCriticalServiceAfter = GetConf().Consul.CheckDeregisterCriticalServiceAfterTime
+	} else if conf.GetConf().Consul.CheckDeregisterCriticalServiceAfterTime != "" {
+		check.DeregisterCriticalServiceAfter = conf.GetConf().Consul.CheckDeregisterCriticalServiceAfterTime
 	} else {
 		logrus.WithFields(logrus.Fields{}).Fatal("未输入自动删除时间...")
 	}
@@ -211,7 +220,7 @@ func (CA *Addresses) CheckAddr(ServiceName string) error {
 	}
 	var i int
 	for _, v := range SvcIDs {
-		if v == GetConf().Service.Tag+"-"+GetAddrs() {
+		if v == conf.GetConf().Service.Tag+"-"+GetAddrs() {
 			i++
 		}
 	}
@@ -219,8 +228,8 @@ func (CA *Addresses) CheckAddr(ServiceName string) error {
 	//通过查询到的注册情况判定如何注册
 	var addr string
 	if i > 1 {
-		CA.CheckAddrs(GetConf().Service.Tag, GetAddrs())
-		addr, err = CA.CheckSorted(GetConf().Service.Tag)
+		CA.CheckAddrs(conf.GetConf().Service.Tag, GetAddrs())
+		addr, err = CA.CheckSorted(conf.GetConf().Service.Tag)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Fatal(err.Error())
 			return err
@@ -228,7 +237,7 @@ func (CA *Addresses) CheckAddr(ServiceName string) error {
 		CA.ConsulRegister(addr)
 		logrus.WithFields(logrus.Fields{}).Info("More than 1 ServiceID detected,Service Registied Success...")
 	} else if i == 0 {
-		addr, err = CA.CheckSorted(GetConf().Service.Tag)
+		addr, err = CA.CheckSorted(conf.GetConf().Service.Tag)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Fatal(err.Error())
 			return err
@@ -239,13 +248,4 @@ func (CA *Addresses) CheckAddr(ServiceName string) error {
 		logrus.WithFields(logrus.Fields{}).Info("Only One Same ServiceID Detected...")
 	}
 	return nil
-}
-
-func GetConf() *conf.Config {
-	var conf *conf.Config
-	config2, err := conf.GetConfig()
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Fatal(err.Error())
-	}
-	return config2
 }

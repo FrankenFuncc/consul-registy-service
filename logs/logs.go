@@ -17,7 +17,7 @@ import (
 )
 
 type TraceIdHook struct {
-	TraceId  string
+	TraceId string
 }
 
 func (hook *TraceIdHook) Fire(entry *logrus.Entry) error {
@@ -43,10 +43,9 @@ func (s *LogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	var conf *config.Config
 	config, err := conf.GetConfig()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-		}).Info(err.Error())
+		logrus.WithFields(logrus.Fields{}).Info(err.Error())
 	}
-	msg := fmt.Sprintf("%s [GOID:%d] [%s] [%s] [%s:%d] %s\n",timestamp, getGID(), config.System.ServiceName, strings.ToUpper(entry.Level.String()),  file, len, entry.Message)
+	msg := fmt.Sprintf("%s [GOID:%d] [%s] [%s] [%s:%d] %s\n", timestamp, getGID(), config.System.ServiceName, strings.ToUpper(entry.Level.String()), file, len, entry.Message)
 	return []byte(msg), nil
 }
 
@@ -76,29 +75,23 @@ func (p *logFileWriter) Write(data []byte) (n int, err error) {
 	}
 	//判断是否需要切换日期
 	fileDate := time.Now().Format("20060102")
-		filename := fmt.Sprintf("%s/%s-%s.log", p.logPath,  p.appName, fileDate)
+	filename := fmt.Sprintf("%s/%s-%s.log", p.logPath, p.appName, fileDate)
 
-		p.file, err = os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE|os.O_SYNC, 0666)
-		if err != nil {
-			return 0, err
-		}
+	p.file, err = os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE|os.O_SYNC, 0666)
+	if err != nil {
+		return 0, err
+	}
 	n, err = p.file.Write(data)
 	return n, err
 }
 
 func SetLogLevel() error {
-	var conf *conf.Config
-	config2, err := conf.GetConfig()
-	if err !=nil {
-		logrus.WithFields(logrus.Fields{
-		}).Fatal(err.Error())
-	}
-	level := config2.SiteLogs.LogLevel
+	level := conf.GetConf().SiteLogs.LogLevel
 	if level == "info" {
 		logrus.SetLevel(logrus.InfoLevel)
 	} else if level == "debug" || level == "DEBUG" {
 		logrus.SetLevel(logrus.DebugLevel)
-	} else if level == "trace" || level == "TRACE"{
+	} else if level == "trace" || level == "TRACE" {
 		logrus.SetLevel(logrus.TraceLevel)
 	} else if level == "fatal" || level == "FATAL" {
 		logrus.SetLevel(logrus.FatalLevel)
@@ -109,15 +102,14 @@ func SetLogLevel() error {
 	} else if level == "panic" || level == "PANIC" {
 		logrus.SetLevel(logrus.PanicLevel)
 	} else {
-		logrus.WithFields(logrus.Fields{
-		}).Fatal("Wrong Log level Configed...")
+		logrus.WithFields(logrus.Fields{}).Fatal("Wrong Log level Configed...")
 	}
 	return nil
 }
 
 func InitLog(logPath string) {
 	writer, _ := rotatelogs.New(
-		logPath + ".%Y%m%d%H%M",
+		logPath+".%Y%m%d%H%M",
 		rotatelogs.WithLinkName(logPath),
 		rotatelogs.WithMaxAge(time.Duration(360)*time.Hour),
 		rotatelogs.WithRotationTime(time.Duration(24)*time.Hour),
