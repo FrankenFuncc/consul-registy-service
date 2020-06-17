@@ -9,6 +9,7 @@ Logs:
   LogLevel: trace
 Consul:
   Address: 172.16.100.71:8500,172.16.100.72:8500,172.16.100.73:8500
+  #Consul Master Token
   Token: 8dc1eb67-1f5f-4e10-ad9d-5e58b047647c
   CheckTimeout: 5s
   CheckInterval: 5s
