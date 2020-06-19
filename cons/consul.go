@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -209,6 +210,27 @@ func (CS *Addresses) CheckSorted(ServiceName string) (string, error) {
 		break
 	}
 	return mixIP, nil
+}
+
+func GetSvcCode() bool {
+	u, _ := url.Parse("http://" + GetAddrs() + ":" + conf.GetConf().Service.Port)
+	q := u.Query()
+	u.RawQuery = q.Encode()
+	res, err := http.Get(u.String())
+	if err != nil {
+		fmt.Println("0")
+		return false
+	}
+	resCode := res.StatusCode
+	res.Body.Close()
+	if err != nil {
+		fmt.Println("0")
+		return false
+	}
+	if resCode == 200 {
+		return true
+	}
+	return false
 }
 
 func (CA *Addresses) CheckAddr(ServiceName string) error {
