@@ -112,7 +112,7 @@ func (CA *Addresses) CheckAddrs(tag string, addr string) error {
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Fatal(err.Error())
 	}
-	logrus.WithFields(logrus.Fields{}).Info("Deleting All Registy infomation...")
+	logrus.WithFields(logrus.Fields{}).Info("删除所有注册的信息...")
 	for i := 0; i < len(CA.GetAllAddr()); i++ {
 		config := consulapi.DefaultConfig()
 		config.Address = CA.GetAllAddr()[i]
@@ -142,7 +142,7 @@ func (CR *Addresses) ConsulRegister(addr string) {
 		logrus.WithFields(logrus.Fields{}).Fatal(err.Error())
 		panic("consul client error" + err.Error())
 	}
-	logrus.WithFields(logrus.Fields{}).Info("New Consul Connection Created...")
+	logrus.WithFields(logrus.Fields{}).Info("建立了新的consul连接...")
 	// 创建注册到consul的服务到
 	registration := new(consulapi.AgentServiceRegistration)
 	registration.ID = conf.GetConf().Service.Tag + "-" + GetAddrs()
@@ -245,7 +245,7 @@ func (CA *Addresses) CheckAddr(ServiceName string) error {
 		CA.ConsulRegister(addr)
 		logrus.WithFields(logrus.Fields{}).Info("None ServiceID detected,Service Registied Success...")
 	} else {
-		logrus.WithFields(logrus.Fields{}).Info("Only One Same ServiceID Detected...")
+		logrus.WithFields(logrus.Fields{}).Info("A Same ServiceID Detected...")
 	}
 	return nil
 }

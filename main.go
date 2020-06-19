@@ -11,11 +11,11 @@ import (
 func main() {
 	logs.InitLog(conf.GetConf().SiteLogs.LogFilePath)
 	RegistyStart := new(consul.Addresses)
-	_, err := RegistyStart.CheckSorted("node-exporter")
+	_, err := RegistyStart.CheckSorted(conf.GetConf().Service.Tag)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Info(err.Error())
 	}
-	err = RegistyStart.CheckAddr("node-exporter")
+	err = RegistyStart.CheckAddr(conf.GetConf().Service.Tag)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Info(err.Error())
 		panic("Error" + err.Error())
