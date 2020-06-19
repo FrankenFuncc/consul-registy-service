@@ -10,8 +10,6 @@ import (
 )
 
 func main() {
-
-	//time.Sleep(time.Duration(20) * time.Second)
 	logs.InitLog(conf.GetConf().SiteLogs.LogFilePath)
 Check:
 	if !consul.GetSvcCode() {
